@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
-const path = require('path'); // Error theek karne ke liye ye add kiya hai
 
 const app = express();
 const server = http.createServer(app);
@@ -10,12 +9,7 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8 // Increased limit to allow large images and files
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Root URL par index.html file serve karne ke liye
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use(express.static('public'));
 
 // MongoDB Connection using Environment Variable or your connection string
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://ritikpathak8570_db_user:MRQnWJf1nP9EaxvZ@cluster0.vqrk1qc.mongodb.net/connection?retryWrites=true&w=majority&appName=Cluster0";
@@ -125,7 +119,7 @@ io.on('connection', async (socket) => {
         try {
             // Jo message dusre ne bheje hain aur abhi tak 'read' nahi hue hain, unko 'read' mark karo
             const result = await Message.updateMany(
-                { sender: { $ne: readerName }, status: {$ne: 'read' } },
+                { sender: { $ne: readerName }, status: { $ne: 'read' } },
                 { $set: { status: 'read' } }
             );
             // Agar koi message update hua hai toh sabko signal bhejo ticks blue karne ke liye
